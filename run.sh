@@ -7,10 +7,10 @@
 # License: GPLv3
 
 echo "Running outage probability for constant phases..."
-python3 constant_phases.py -N 10 50 --plot
+python3 constant_phases.py -N 10 50 -n 50000 --plot
 
 echo "Running two-element example with random phases..."
-python3 
+python3 random_phases.py -N 2 -s 1000 -f 5000 --plot
 
 echo "Running two-element example with quantized phases..."
 python3 
