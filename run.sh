@@ -12,6 +12,9 @@ python3 constant_phases.py -a 0 -N 4 10 50 -n 1000000 --plot
 echo "LOS Scenario with a=2"
 python3 constant_phases.py -a 2 -N 4 10 50 -n 1000000 --plot
 
+echo "Calculating ergodic capacities for NLOS scenario..."
+python3 ergodic_capacity.py -a 0 -N {4..50} --plot
+
 #echo "Running two-element example with random phases..."
 #python3 random_phases.py -N 2 -s 1000 -f 5000 --plot
 #
