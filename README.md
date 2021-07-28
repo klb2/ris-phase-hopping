@@ -2,14 +2,13 @@
 
 This repository is accompanying the paper "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
-Jorswieck, Karl-L. Besser, and Cong Sun. Submitted to SPAWC 2021, [doi:XXX](),
-[arXiv:XXX]()).
+Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021, [doi:XXX]()).
 
 The idea is to give an interactive version of the calculations and presented
 concepts to the reader. One can also change different parameters and explore
 different behaviors on their own.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/spawc)
 
 
 ## File List
@@ -20,7 +19,7 @@ The following files are provided in this repository:
 ### Running it online
 The easiest way is to use services like [Binder](https://mybinder.org/) to run
 the notebook online. Simply navigate to
-[https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master](https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master)
+[https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/spawc](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/spawc)
 to run the notebooks in your browser without setting everything up locally.
 
 ### Local Installation
