@@ -72,8 +72,7 @@ bash run.sh
 
 ## Acknowledgements
 This research was supported in part by the Deutsche Forschungsgemeinschaft
-(DFG) under grant JO 801/23-1 and by the National Natural Science Foundation of
-China (NSFC) 11771056, 11871115.
+(DFG) under grant JO 801/23-1.
 
 
 ## License and Referencing
