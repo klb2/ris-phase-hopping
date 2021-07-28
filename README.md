@@ -1,4 +1,4 @@
-# Artificial Fast Fading from RIS
+# RIS Phase Hopping for Ultra-Reliable Communications
 
 This repository is accompanying the papers "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
@@ -29,6 +29,8 @@ The following files are provided in this repository:
   varying RIS phases.
 - `discrete_phases.py`: Python script that runs the simulations for randomly
   varying RIS phases with only a discrete set of possible phase values.
+- `ergodic_capacity.py`: Python script that calculates the ergodic capacities
+  for phase hopping systems with different numbers of elements.
 - `phases.py`: Python module that contains helper functions to generate the RIS
   phases according to the different scenarios.
 
