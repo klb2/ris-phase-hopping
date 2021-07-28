@@ -32,8 +32,8 @@ def ergodic_capac_exact(num_elements, los_amp=0.):
     return cap_erg
 
 def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
-                      plot=False, export=False, batch_size=1000):
-    if plot:
+                      plot=False, export=False, batch_size=1000, logplot=False):
+    if plot or logplot:
         fig, axs = plt.subplots()
     erg_capac_mc = []
     erg_capac_appr = []
@@ -63,8 +63,9 @@ def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_sampl
         _erg_cap_mc = np.mean(expect_capac)
         print("Simulated ergodic capacity: {:.3f}".format(_erg_cap_mc))
         _hist = np.histogram(expect_capac, bins=100)
-        #_r_ax = np.linspace(1, 6, 2000)
-        _r_ax = np.logspace(np.log10(min(expect_capac)), np.log10(max(expect_capac)), 2000)
+        _r_ax = np.linspace(1, 6, 2000)
+        if logplot:
+            _r_ax = np.logspace(np.log10(min(expect_capac)), np.log10(max(expect_capac)), 2000)
         cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
         if los_amp == 0.:
             _erg_cap_appr = -np.exp(1/_num_elements)*special.expi(-1/_num_elements)/np.log(2)
@@ -80,10 +81,13 @@ def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_sampl
         cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
         cdf_exact = np.heaviside(_r_ax-_erg_cap_exact, 0)
         if plot:
-            #axs.plot(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
-            #axs.plot(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
-            #axs.plot(_r_ax, cdf_exact, '-.', label="Exact -- {:d}".format(_num_elements))
+            axs.plot(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
+            axs.plot(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
+            axs.plot(_r_ax, cdf_exact, '-.', label="Exact -- {:d}".format(_num_elements))
+        elif logplot:
             axs.semilogy(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
+            axs.semilogy(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
+            axs.semilogy(_r_ax, cdf_exact, '-.', label="Exact -- {:d}".format(_num_elements))
         if export:
             results["rate"] = _r_ax
             results["ecdf"] = cdf_hist
@@ -95,7 +99,7 @@ def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_sampl
             _fn = "{}-{}-{}".format(_fn_prefix, _fn_mid, _fn_end)
             export_results(results, _fn)
 
-    if plot:
+    if plot or logplot:
         axs.legend()
         #axs.set_title("Artificial Fast Fading with N={:d} RIS Elements".format(num_elements))
         axs.set_xlabel("Rate $R$")
@@ -113,6 +117,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--plot", action="store_true")
+    parser.add_argument("--logplot", action="store_true")
     parser.add_argument("--export", action="store_true")
     parser.add_argument("-N", "--num_elements", type=int, nargs="+", required=True)
     parser.add_argument("-f", "--num_samples_fast", type=int, default=5000)
