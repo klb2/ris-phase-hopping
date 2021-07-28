@@ -1,3 +1,35 @@
+"""Calculations for constant RIS phases
+
+This module contains the functions to calculate the outage probability for
+constant RIS phases.
+
+
+Copyright (C) 2021 Karl-Ludwig Besser
+
+This program is used in the article:
+Eduard Jorswieck, Karl-Ludwig Besser, and Cong Sun, "Artificial Fast Fading
+from Reconfigurable Surfaces Enables Ultra-Reliable Communications", IEEE
+International Workshop on Signal Processing Advances in Wireless Communications
+(SPAWC), 2021.
+
+License:
+This program is licensed under the GPLv3 license. If you in any way use this
+code for research that results in publications, please cite our original
+article listed above.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+Author: Karl-Ludwig Besser, Technische Universität Braunschweig
+"""
+__author__ = "Karl-Ludwig Besser"
+__copyright__ = "Copyright (C) 2021 Karl-Ludwig Besser"
+__credits__ = ["Karl-Ludwig Besser", "Eduard A. Jorswieck"]
+__license__ = "GPLv3"
+__version__ = "1.0"
+
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt

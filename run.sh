@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run all script to generate the results presented in the paper "Artificial
 # Fast Fading from Reconfigurable Surfaces Enables Ultra-Reliable
-# Communications" (Eduard Jorswieck, Karl-L. Besser, Cong Sun).
+# Communications" (Eduard Jorswieck, Karl-L. Besser, Cong Sun. IEEE SPAWC 2021).
 #
 # Copyright (C) 2021 Karl-Ludwig Besser
 # License: GPLv3
