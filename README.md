@@ -1,26 +1,43 @@
 # Artificial Fast Fading from RIS
 
-This repository is accompanying the paper "Artificial Fast Fading from
+This repository is accompanying the papers "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
-Jorswieck, Karl-L. Besser, and Cong Sun. Submitted to SPAWC 2021, [doi:XXX](),
-[arXiv:XXX]()).
+Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021, [doi:XXX]()) and
+"Reconfigurable Intelligent Surface Phase Hopping for Ultra-Reliable
+Communications" (Karl-L. Besser and Eduard Jorswieck. Submitted for
+publication, Jul. 2021, [arXiv:2107.11852](https://arxiv.org/abs/2107.11852)).
 
 The idea is to give an interactive version of the calculations and presented
 concepts to the reader. One can also change different parameters and explore
 different behaviors on their own.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master)
+The material for the conference paper can be found on the `spawc` branch.
+The `master` branch contains the scripts for the journal version.
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/master)
 
 
 ## File List
 The following files are provided in this repository:
+
+- [RIS Simulation.ipynb](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/spawc?filepath=RIS%20Simulation.ipynb): Jupyter notebook that contains an interactive version of
+  the simulations.
+- `run.sh`: Bash script that reproduces the figures presented in the paper.
+- `constant_phases.py`: Python script that runs the simulations for constant
+  RIS phases.
+- `random_phases.py`: Python script that runs the simulations for randomly
+  varying RIS phases.
+- `discrete_phases.py`: Python script that runs the simulations for randomly
+  varying RIS phases with only a discrete set of possible phase values.
+- `phases.py`: Python module that contains helper functions to generate the RIS
+  phases according to the different scenarios.
 
 
 ## Usage
 ### Running it online
 The easiest way is to use services like [Binder](https://mybinder.org/) to run
 the notebook online. Simply navigate to
-[https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master](https://mybinder.org/v2/gl/klb2%2Fartificial-fast-fading-ris/master)
+[https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/master](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/master)
 to run the notebooks in your browser without setting everything up locally.
 
 ### Local Installation
