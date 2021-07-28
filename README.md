@@ -14,6 +14,18 @@ different behaviors on their own.
 ## File List
 The following files are provided in this repository:
 
+- [RIS Simulation.ipynb](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/spawc?filepath=RIS%20Simulation.ipynb): Jupyter notebook that contains an interactive version of
+  the simulations.
+- `run.sh`: Bash script that reproduces the figures presented in the paper.
+- `constant_phases.py`: Python script that runs the simulations for constant
+  RIS phases.
+- `random_phases.py`: Python script that runs the simulations for randomly
+  varying RIS phases.
+- `discrete_phases.py`: Python script that runs the simulations for randomly
+  varying RIS phases with only a discrete set of possible phase values.
+- `phases.py`: Python module that contains helper functions to generate the RIS
+  phases according to the different scenarios.
+
 
 ## Usage
 ### Running it online
