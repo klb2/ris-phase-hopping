@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from rearrangement_algorithm import basic_rearrange
+#from rearrangement_algorithm import basic_rearrange
 
 def rvs_channel_phases(num_elements, num_samples):
     resulting_phase = np.random.rand(num_samples, num_elements)*2*np.pi
@@ -35,8 +35,12 @@ def rvs_ris_phases_quant(num_elements, num_samples_slow, num_samples_fast, copul
         #ris_phases = np.random.choice(_choices, (num_samples_fast, num_samples_slow, num_elements))
         ris_phases = np.random.randint(0, K, size=(num_samples_fast, num_samples_slow, num_elements))*2*np.pi/K
     elif copula.startswith("count"):
+        if num_elements != 2:
+            raise NotImplementedError("Countermonotonic is currently only implemented for N=2")
         phase_mat = np.tile(_choices, (num_elements, 1)).T
-        joint_dist = basic_rearrange(phase_mat, max)# , cost_func=_opt_func_mod2_sum)
+        #joint_dist = basic_rearrange(phase_mat, max)# , cost_func=_opt_func_mod2_sum)
+        phase_mat[:, 1] = phase_mat[:, 1][::-1]
+        joint_dist = np.copy(phase_mat)
         #print(joint_dist)#, _opt_func_mod2_sum(joint_dist, axis=1))
         #print(_opt_func_mod2_sum(joint_dist, axis=1))
         print(np.sum(joint_dist, axis=1))
