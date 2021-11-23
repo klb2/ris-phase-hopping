@@ -8,8 +8,8 @@ def rvs_channel_phases(num_elements, num_samples):
     resulting_phase = np.random.rand(num_samples, num_elements)*2*np.pi
     return resulting_phase
 
-def gains_constant_phase(channel_phases, los_phase=None, los_amp=1.):
-    combined_phases = np.sum(np.exp(-1j*channel_phases), axis=-1)
+def gains_constant_phase(channel_phases, los_phase=None, los_amp=1., path_amp=1.):
+    combined_phases = np.sum(path_amp*np.exp(-1j*channel_phases), axis=-1)
     if los_phase is not None:
         combined_phases = los_amp*np.exp(1j*los_phase) + combined_phases
     return np.abs(combined_phases)**2
