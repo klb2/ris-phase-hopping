@@ -2,17 +2,20 @@
 
 This repository is accompanying the papers "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
-Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021, [doi:XXX]()) and
-"Reconfigurable Intelligent Surface Phase Hopping for Ultra-Reliable
-Communications" (Karl-L. Besser and Eduard Jorswieck. Submitted for
-publication, Jul. 2021, [arXiv:2107.11852](https://arxiv.org/abs/2107.11852)).
+Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021,
+[doi:10.1109/SPAWC51858.2021.9593269](https://doi.org/10.1109/SPAWC51858.2021.9593269)),
+"RIS-Assisted Statistical Channel Shaping for Ultra-High Reliability" (Karl-L.
+Besser and Eduard Jorswieck. WSA 2021), and "Reconfigurable
+Intelligent Surface Phase Hopping for Ultra-Reliable Communications" (Karl-L.
+Besser and Eduard Jorswieck. Submitted for publication, Jul. 2021,
+[arXiv:2107.11852](https://arxiv.org/abs/2107.11852)).
 
 The idea is to give an interactive version of the calculations and presented
 concepts to the reader. One can also change different parameters and explore
 different behaviors on their own.
 
-The material for the conference paper can be found on the `spawc` branch.
-The `master` branch contains the scripts for the journal version.
+The material for the conference paper can be found on the `spawc` branch. The
+`master` branch contains the scripts for the journal version.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gl/klb2%2Fris-phase-hopping/master)
 
