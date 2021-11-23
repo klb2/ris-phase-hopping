@@ -2,7 +2,8 @@
 
 This repository is accompanying the paper "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
-Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021, [doi:XXX]()).
+Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021,
+[doi:10.1109/SPAWC51858.2021.9593269](https://doi.org/10.1109/SPAWC51858.2021.9593269)).
 
 The idea is to give an interactive version of the calculations and presented
 concepts to the reader. One can also change different parameters and explore
@@ -74,3 +75,19 @@ China (NSFC) 11771056, 11871115.
 This program is licensed under the GPLv3 license. If you in any way use this
 code for research that results in publications, please cite our original
 article listed above.
+
+You can use the following BibTeX entry
+```bibtex
+@inproceedings{Jorswieck2021spawc,
+	address = {Lucca, Italy},
+	author = {Jorswieck, Eduard and Besser, Karl-ludwig and Sun, Cong},
+	booktitle = {2021 IEEE 22nd International Workshop on Signal Processing Advances in Wireless Communications (SPAWC)},
+	doi = {10.1109/SPAWC51858.2021.9593269},
+	isbn = {978-1-6654-2851-4},
+	month = {9},
+	pages = {566--570},
+	publisher = {IEEE},
+	title = {Artificial Fast Fading from Reconfigurable Surfaces Enables Ultra-Reliable Communications},
+	year = {2021}
+}
+```
