@@ -1,10 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import stats, special, integrate
+from scipy import stats, special, integrate, optimize
 import hankel
 
 from phases import rvs_channel_phases, rvs_ris_phases, gains_constant_phase
 from utils import export_results
+
+
+@np.vectorize
+def inverse_exp_expi(y):
+    def exp_expi(x):
+        return -np.exp(x)*special.expi(-x)
+    #sol = optimize.root_scalar(lambda x: (exp_expi(x)-y)**2, bracket=(0., np.inf))
+    sol = optimize.minimize(lambda x: (exp_expi(x)-y)**2, (1e-16,), bounds=optimize.Bounds(0, np.inf))
+    #print(sol)
+    return sol.x
+
 
 def ergodic_capac_approximation(num_elements, los_amp):
     def _int_func(s, n, a):
@@ -14,6 +25,10 @@ def ergodic_capac_approximation(num_elements, los_amp):
     return erg_capac
 
 def ergodic_capac_exact(num_elements, los_amp=0.):
+    if num_elements == 0:
+        return 0.
+    elif num_elements == 1:
+        return 1. #log2(1+1)
     if los_amp > 0:
         raise NotImplementedError("Right now, only the NLOS case is supported.")
     nu = 0
@@ -31,7 +46,7 @@ def ergodic_capac_exact(num_elements, los_amp=0.):
         cap_erg = _quad_int[0]
     return cap_erg
 
-def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
+def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
                       plot=False, export=False, batch_size=1000, logplot=False):
     if plot or logplot:
         fig, axs = plt.subplots()
@@ -56,30 +71,43 @@ def random_ris_phases(num_elements, los_amp=1., num_samples_slow=1000, num_sampl
             ris_phases = rvs_ris_phases(_num_elements, batch_size,
                                         num_samples_fast, copula="indep")
             total_phases = channel_realizations + ris_phases
-            const_phase = gains_constant_phase(total_phases, los_phase=los_phases, los_amp=los_amp)
+            channel_absolute = stats.bernoulli.rvs(p=connect_prob, size=(batch_size, _num_elements))
+            channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
+            const_phase = gains_constant_phase(total_phases,
+                                               los_phase=los_phases,
+                                               los_amp=los_amp,
+                                               path_amp=channel_absolute)
             capac_const_phase = np.log2(1 + const_phase)
             expect_capac = np.append(expect_capac, np.mean(capac_const_phase, axis=0))
-        print(len(expect_capac))
+        #print(len(expect_capac))
         _erg_cap_mc = np.mean(expect_capac)
         print("Simulated ergodic capacity: {:.3f}".format(_erg_cap_mc))
         _hist = np.histogram(expect_capac, bins=100)
-        _r_ax = np.linspace(1, 6, 2000)
+        _r_ax = np.linspace(0, 6, 2000)
         if logplot:
             _r_ax = np.logspace(np.log10(min(expect_capac)), np.log10(max(expect_capac)), 2000)
-        cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
         if los_amp == 0.:
-            _erg_cap_appr = -np.exp(1/_num_elements)*special.expi(-1/_num_elements)/np.log(2)
-            _erg_cap_exact = ergodic_capac_exact(_num_elements, los_amp=0.)
-            print("Exact ergodic capacity: {:.3f}".format(_erg_cap_exact))
+            #_erg_cap_appr = -np.exp(1/_num_elements)*special.expi(-1/_num_elements)/np.log(2)
+            _inv_exi = inverse_exp_expi(_r_ax*np.log(2))
+            print("Calculating the exact ergodic capacities...")
+            _erg_cap_exact = [ergodic_capac_exact(__n, los_amp=0.) for __n in range(_num_elements+1)]
+            _probs_cap_exact = [stats.binom(n=_num_elements, p=connect_prob).pmf(__n) for __n in range(_num_elements+1)]
+            print("Exact ergodic capacity: {}".format(_erg_cap_exact))
+            print("Exact ergodic probabilities: {}".format(_probs_cap_exact))
         else:
             _erg_cap_appr = ergodic_capac_approximation(_num_elements, los_amp)
-            _erg_cap_exact = 0.
-        erg_capac_appr.append(_erg_cap_appr)
-        erg_cap_exact.append(_erg_cap_exact)
-        erg_capac_mc.append(_erg_cap_mc) # technically all expect_capac should be equal
-        print("Approximated ergodic capacity: {:.3f}".format(_erg_cap_appr))
-        cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
-        cdf_exact = np.heaviside(_r_ax-_erg_cap_exact, 0)
+            _erg_cap_exact = [0.]
+            _probs_cap_exact = [1.]
+        #erg_capac_appr.append(_erg_cap_appr)
+        #erg_cap_exact.append(_erg_cap_exact)
+        #erg_capac_mc.append(_erg_cap_mc) # technically all expect_capac should be equal
+        #print("Approximated ergodic capacity: {:.3f}".format(_erg_cap_appr))
+        cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
+        #cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
+        cdf_appr = stats.binom(n=_num_elements, p=connect_prob).cdf(1/_inv_exi)
+        cdf_exact = np.sum([np.heaviside(_r_ax-__erg_cap, 0)*_p
+                            for _p, __erg_cap in zip(_probs_cap_exact, _erg_cap_exact)],
+                           axis=0)
         if plot:
             axs.plot(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
             axs.plot(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
@@ -123,7 +151,8 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--num_samples_fast", type=int, default=5000)
     parser.add_argument("-s", "--num_samples_slow", type=int, default=1000)
     parser.add_argument("-b", "--batch_size", type=int, default=1000)
-    parser.add_argument("-a", "--los_amp", type=float, default=1.)
+    parser.add_argument("-a", "--los_amp", type=float, default=0.)
+    parser.add_argument("-p", "--connect_prob", type=float, default=1.)
     args = vars(parser.parse_args())
     random_ris_phases(**args)
     plt.show()
