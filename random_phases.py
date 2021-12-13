@@ -20,6 +20,8 @@ def inverse_exp_expi(y):
 
 
 def ergodic_capac_approximation(num_elements, los_amp):
+    if num_elements == 0:
+        return 0.
     def _int_func(s, n, a):
         return np.log2(1.+s)*np.exp(-(a**2+s)/n)*special.i0(2*a/n*np.sqrt(s))
     _int = integrate.quad(_int_func, 0, np.inf, args=(num_elements, los_amp))
