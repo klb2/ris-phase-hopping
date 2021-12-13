@@ -1,3 +1,5 @@
+import itertools as it
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats, special, integrate, optimize
@@ -46,7 +48,7 @@ def ergodic_capac_exact(num_elements, los_amp=0.):
         cap_erg = _quad_int[0]
     return cap_erg
 
-def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
+def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
                       plot=False, export=False, batch_size=1000, logplot=False):
     if plot or logplot:
         fig, axs = plt.subplots()
@@ -55,8 +57,9 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
     erg_cap_exact = []
 
     num_batches, last_batch = np.divmod(num_samples_slow, batch_size)
-    for _num_elements in num_elements:
-        print("Work on N={:d}".format(_num_elements))
+    #for _num_elements in num_elements:
+    for _num_elements, _conn_prob in it.product(num_elements, connect_prob):
+        print("Work on N={:d}, p={:.3f}".format(_num_elements, _conn_prob))
         results = {}
         expect_capac = []
         for _batch in range(num_batches):
@@ -71,7 +74,7 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
             ris_phases = rvs_ris_phases(_num_elements, batch_size,
                                         num_samples_fast, copula="indep")
             total_phases = channel_realizations + ris_phases
-            channel_absolute = stats.bernoulli.rvs(p=connect_prob, size=(batch_size, _num_elements))
+            channel_absolute = stats.bernoulli.rvs(p=_conn_prob, size=(batch_size, _num_elements))
             channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
             const_phase = gains_constant_phase(total_phases,
                                                los_phase=los_phases,
@@ -83,7 +86,7 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
         _erg_cap_mc = np.mean(expect_capac)
         print("Simulated ergodic capacity: {:.3f}".format(_erg_cap_mc))
         _hist = np.histogram(expect_capac, bins=100)
-        _r_ax = np.linspace(0, 6, 2000)
+        _r_ax = np.linspace(0, 5, 2000)
         if logplot:
             _r_ax = np.logspace(np.log10(min(expect_capac)), np.log10(max(expect_capac)), 2000)
         if los_amp == 0.:
@@ -91,7 +94,7 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
             _inv_exi = inverse_exp_expi(_r_ax*np.log(2))
             print("Calculating the exact ergodic capacities...")
             _erg_cap_exact = [ergodic_capac_exact(__n, los_amp=0.) for __n in range(_num_elements+1)]
-            _probs_cap_exact = [stats.binom(n=_num_elements, p=connect_prob).pmf(__n) for __n in range(_num_elements+1)]
+            _probs_cap_exact = [stats.binom(n=_num_elements, p=_conn_prob).pmf(__n) for __n in range(_num_elements+1)]
             print("Exact ergodic capacity: {}".format(_erg_cap_exact))
             print("Exact ergodic probabilities: {}".format(_probs_cap_exact))
         else:
@@ -104,7 +107,7 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
         #print("Approximated ergodic capacity: {:.3f}".format(_erg_cap_appr))
         cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
         #cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
-        cdf_appr = stats.binom(n=_num_elements, p=connect_prob).cdf(1/_inv_exi)
+        cdf_appr = stats.binom(n=_num_elements, p=_conn_prob).cdf(1/_inv_exi)
         cdf_exact = np.sum([np.heaviside(_r_ax-__erg_cap, 0)*_p
                             for _p, __erg_cap in zip(_probs_cap_exact, _erg_cap_exact)],
                            axis=0)
@@ -123,7 +126,7 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
             results["exact"] = cdf_exact
             _fn_prefix = "out-prob-random-phase"
             _fn_mid = "los-a{:.2f}".format(los_amp) if los_amp > 0 else "nlos"
-            _fn_end = "N{:d}".format(_num_elements)
+            _fn_end = "N{:d}-p{:.3f}".format(_num_elements, _conn_prob)
             _fn = "{}-{}-{}".format(_fn_prefix, _fn_mid, _fn_end)
             export_results(results, _fn)
 
@@ -133,13 +136,13 @@ def random_ris_phases(num_elements, connect_prob=1., los_amp=1., num_samples_slo
         axs.set_xlabel("Rate $R$")
         axs.set_ylabel("Outage Probability $\\varepsilon$")
 
-    if export:
-        erg_capac_results = {"N": num_elements, "mc": erg_capac_mc, "appr": erg_capac_appr}
-        _fn_prefix = "erg-capac-random-phase"
-        _fn_mid = "los-a{:.2f}".format(los_amp) if los_amp > 0 else "nlos"
-        _fn_end = "N{:d}".format(_num_elements)
-        _fn = "{}-{}-{}".format(_fn_prefix, _fn_mid, _fn_end)
-        export_results(erg_capac_results, _fn)
+    #if export:
+    #    erg_capac_results = {"N": num_elements, "mc": erg_capac_mc, "appr": erg_capac_appr}
+    #    _fn_prefix = "erg-capac-random-phase"
+    #    _fn_mid = "los-a{:.2f}".format(los_amp) if los_amp > 0 else "nlos"
+    #    _fn_end = "N{:d}".format(_num_elements)
+    #    _fn = "{}-{}-{}".format(_fn_prefix, _fn_mid, _fn_end)
+    #    export_results(erg_capac_results, _fn)
 
 if __name__ == "__main__":
     import argparse
@@ -152,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--num_samples_slow", type=int, default=1000)
     parser.add_argument("-b", "--batch_size", type=int, default=1000)
     parser.add_argument("-a", "--los_amp", type=float, default=0.)
-    parser.add_argument("-p", "--connect_prob", type=float, default=1.)
+    parser.add_argument("-p", "--connect_prob", type=float, nargs="+", default=[1.])
     args = vars(parser.parse_args())
     random_ris_phases(**args)
     plt.show()
