@@ -21,7 +21,7 @@ def inverse_exp_expi(y):
 
 def ergodic_capac_approximation(num_elements, los_amp):
     if num_elements == 0:
-        return 0.
+        return np.log2(1 + los_amp**2)
     def _int_func(s, n, a):
         return np.log2(1.+s)*np.exp(-(a**2+s)/n)*special.i0(2*a/n*np.sqrt(s))
     _int = integrate.quad(_int_func, 0, np.inf, args=(num_elements, los_amp))
@@ -91,16 +91,21 @@ def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_s
         _r_ax = np.linspace(0, 5, 2000)
         if logplot:
             _r_ax = np.logspace(np.log10(min(expect_capac)), np.log10(max(expect_capac)), 2000)
+        _probs_cap_exact = [stats.binom(n=_num_elements, p=_conn_prob).pmf(__n) for __n in range(_num_elements+1)]
         if los_amp == 0.:
             #_erg_cap_appr = -np.exp(1/_num_elements)*special.expi(-1/_num_elements)/np.log(2)
             _inv_exi = inverse_exp_expi(_r_ax*np.log(2))
+            cdf_appr = stats.binom(n=_num_elements, p=_conn_prob).cdf(1/_inv_exi)
             print("Calculating the exact ergodic capacities...")
             _erg_cap_exact = [ergodic_capac_exact(__n, los_amp=0.) for __n in range(_num_elements+1)]
-            _probs_cap_exact = [stats.binom(n=_num_elements, p=_conn_prob).pmf(__n) for __n in range(_num_elements+1)]
             print("Exact ergodic capacity: {}".format(_erg_cap_exact))
             print("Exact ergodic probabilities: {}".format(_probs_cap_exact))
         else:
-            _erg_cap_appr = ergodic_capac_approximation(_num_elements, los_amp)
+            _erg_cap_appr = [ergodic_capac_approximation(_n, los_amp) for _n in range(_num_elements+1)]
+            print(_erg_cap_appr)
+            cdf_appr = np.sum([np.heaviside(_r_ax-__erg_cap, 0)*_p
+                               for _p, __erg_cap in zip(_probs_cap_exact, _erg_cap_appr)],
+                              axis=0)
             _erg_cap_exact = [0.]
             _probs_cap_exact = [1.]
         #erg_capac_appr.append(_erg_cap_appr)
@@ -109,14 +114,14 @@ def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_s
         #print("Approximated ergodic capacity: {:.3f}".format(_erg_cap_appr))
         cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
         #cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
-        cdf_appr = stats.binom(n=_num_elements, p=_conn_prob).cdf(1/_inv_exi)
         cdf_exact = np.sum([np.heaviside(_r_ax-__erg_cap, 0)*_p
                             for _p, __erg_cap in zip(_probs_cap_exact, _erg_cap_exact)],
                            axis=0)
         if plot:
-            axs.plot(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
-            axs.plot(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
-            axs.plot(_r_ax, cdf_exact, '-.', label="Exact -- {:d}".format(_num_elements))
+            axs.plot(_r_ax, cdf_hist, label="ECDF -- N={:d}, p={:.2f}".format(_num_elements, _conn_prob))
+            axs.plot(_r_ax, cdf_appr, '--', label="Appr -- N={:d}, p={:.2f}".format(_num_elements, _conn_prob))
+            axs.plot(_r_ax, cdf_exact, '-.', label="Exact -- N={:d}, p={:.2f}".format(_num_elements, _conn_prob))
+            #axs.plot(_r_ax, stats.binom(n=_num_elements, p=_conn_prob).cdf(np.sqrt(2**_r_ax-1)), label="Optimal Phases")
         elif logplot:
             axs.semilogy(_r_ax, cdf_hist, label="ECDF -- N={:d}".format(_num_elements))
             axs.semilogy(_r_ax, cdf_appr, '--', label="Appr -- {:d}".format(_num_elements))
