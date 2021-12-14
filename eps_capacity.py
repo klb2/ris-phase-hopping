@@ -18,13 +18,16 @@ def main(num_elements, connect_prob, plot=False, export=False, **kwargs):
         _active_links = binom.ppf(eps)
         eps_cap_appr = [ergodic_capac_approximation(_n, los_amp=0.) for _n in _active_links]
         eps_cap_exact = [ergodic_capac_exact(_n, los_amp=0.) for _n in _active_links]
+        eps_cap_optim = np.log2(1 + _active_links**2)
         results["exact"] = eps_cap_exact
         results["approx"] = eps_cap_appr
+        results["optimal"] = eps_cap_optim
         if export:
             export_results(results, "eps-capac-N{:d}-p{:.3f}.dat".format(_num_el, _conn_prob))
         if plot:
             plt.semilogx(eps, eps_cap_exact, label="N={:d}, p={:.3f} (Exact)".format(_num_el, _conn_prob))
             plt.semilogx(eps, eps_cap_appr, '--', label="N={:d}, p={:.3f} (Approx)".format(_num_el, _conn_prob))
+            plt.semilogx(eps, eps_cap_optim, '.-', label="N={:d}, p={:.3f} (Optimal)".format(_num_el, _conn_prob))
     if plot:
         plt.legend()
         plt.xlabel("Tolerated Outage Probability $\\varepsilon$")
