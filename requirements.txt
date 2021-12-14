@@ -5,3 +5,4 @@ pandas
 jupyter
 ipympl
 hankel
+joblib

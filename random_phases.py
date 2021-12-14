@@ -1,5 +1,6 @@
 import itertools as it
 
+from joblib import cpu_count, Parallel, delayed
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats, special, integrate, optimize
@@ -50,8 +51,33 @@ def ergodic_capac_exact(num_elements, los_amp=0.):
         cap_erg = _quad_int[0]
     return cap_erg
 
+
+def _process_batch(batch, num_batches, batch_size, num_elements, conn_prob,
+                   los_amp, num_samples_fast):
+    print("Work on batch {:d}/{:d}".format(batch+1, num_batches))
+    if los_amp > 0:
+        los_phases = 2*np.pi*np.random.rand(batch_size)
+        los_phases = np.tile(los_phases, (num_samples_fast, 1))
+    else:
+        los_phases = None
+    channel_realizations = rvs_channel_phases(num_elements, batch_size)
+    channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
+    ris_phases = rvs_ris_phases(num_elements, batch_size,
+                                num_samples_fast, copula="indep")
+    total_phases = channel_realizations + ris_phases
+    channel_absolute = stats.bernoulli.rvs(p=conn_prob, size=(batch_size, num_elements))
+    channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
+    const_phase = gains_constant_phase(total_phases,
+                                       los_phase=los_phases,
+                                       los_amp=los_amp,
+                                       path_amp=channel_absolute)
+    capac_const_phase = np.log2(1 + const_phase)
+    #expect_capac = np.append(expect_capac, np.mean(capac_const_phase, axis=0))
+    return np.mean(capac_const_phase, axis=0)
+
 def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_slow=1000, num_samples_fast=5000,
-                      plot=False, export=False, batch_size=1000, logplot=False):
+                      plot=False, export=False, batch_size=1000, logplot=False,
+                      parallel=False):
     if plot or logplot:
         fig, axs = plt.subplots()
     erg_capac_mc = []
@@ -63,27 +89,19 @@ def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_s
     for _num_elements, _conn_prob in it.product(num_elements, connect_prob):
         print("Work on N={:d}, p={:.3f}".format(_num_elements, _conn_prob))
         results = {}
-        expect_capac = []
-        for _batch in range(num_batches):
-            print("Work on batch {:d}/{:d}".format(_batch+1, num_batches))
-            if los_amp > 0:
-                los_phases = 2*np.pi*np.random.rand(batch_size)
-                los_phases = np.tile(los_phases, (num_samples_fast, 1))
-            else:
-                los_phases = None
-            channel_realizations = rvs_channel_phases(_num_elements, batch_size)
-            channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
-            ris_phases = rvs_ris_phases(_num_elements, batch_size,
-                                        num_samples_fast, copula="indep")
-            total_phases = channel_realizations + ris_phases
-            channel_absolute = stats.bernoulli.rvs(p=_conn_prob, size=(batch_size, _num_elements))
-            channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
-            const_phase = gains_constant_phase(total_phases,
-                                               los_phase=los_phases,
-                                               los_amp=los_amp,
-                                               path_amp=channel_absolute)
-            capac_const_phase = np.log2(1 + const_phase)
-            expect_capac = np.append(expect_capac, np.mean(capac_const_phase, axis=0))
+        if parallel:
+            num_cores = cpu_count()
+            expect_capac = Parallel(n_jobs=num_cores)(
+                    delayed(_process_batch)(_batch, num_batches, batch_size,
+                        _num_elements, _conn_prob, los_amp, num_samples_fast)
+                    for _batch in range(num_batches))
+        else:
+            expect_capac = []
+            for _batch in range(num_batches):
+                __expect_cap = _process_batch(_batch, num_batches, batch_size,
+                                              _num_elements, _conn_prob,
+                                              los_amp, num_samples_fast)
+                expect_capac = np.append(expect_capac, __expect_cap)
         #print(len(expect_capac))
         _erg_cap_mc = np.mean(expect_capac)
         print("Simulated ergodic capacity: {:.3f}".format(_erg_cap_mc))
@@ -157,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--plot", action="store_true")
     parser.add_argument("--logplot", action="store_true")
     parser.add_argument("--export", action="store_true")
+    parser.add_argument("--parallel", action="store_true")
     parser.add_argument("-N", "--num_elements", type=int, nargs="+", required=True)
     parser.add_argument("-f", "--num_samples_fast", type=int, default=5000)
     parser.add_argument("-s", "--num_samples_slow", type=int, default=1000)
