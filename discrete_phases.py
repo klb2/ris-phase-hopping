@@ -66,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("-K", "--num_phase_steps", type=int, nargs="+", default=[2, 3, 5, 10])
     parser.add_argument("-f", "--num_samples_fast", type=int, default=5000)
     parser.add_argument("-s", "--num_samples_slow", type=int, default=1000)
+    parser.add_argument("-b", "--batch_size", type=int, default=1000)
     parser.add_argument("-p", "--connect_prob", type=float, nargs="+", default=[1.])
     args = vars(parser.parse_args())
     discrete_rvs_phases(**args)
