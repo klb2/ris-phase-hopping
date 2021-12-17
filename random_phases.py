@@ -62,7 +62,7 @@ def _process_batch(batch, num_batches, batch_size, num_elements, conn_prob,
         los_phases = None
     channel_realizations = rvs_channel_phases(num_elements, batch_size)
     channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
-    if quant is None:
+    if quant is None or quant == 0:
         ris_phases = rvs_ris_phases(num_elements, batch_size,
                                     num_samples_fast, copula="indep")
     else:

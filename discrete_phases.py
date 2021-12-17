@@ -13,8 +13,8 @@ def discrete_rvs_phases(num_elements, num_phase_steps, connect_prob,
                         parallel=False):
     if plot:
         fig, axs = plt.subplots()
-    channel_realizations = rvs_channel_phases(num_elements, num_samples_slow)
-    channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
+    #channel_realizations = rvs_channel_phases(num_elements, num_samples_slow)
+    #channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
     results = {}
     #_r_ax = np.linspace(0.5, 4, 2000)
     _r_ax = np.linspace(0, 3, 2000)
@@ -44,18 +44,18 @@ def discrete_rvs_phases(num_elements, num_phase_steps, connect_prob,
                 expect_capac = []
                 for _batch in range(num_batches):
                     __expect_cap= _process_batch(_batch, num_batches, batch_size,
-                                                num_elements, _conn, 0.,
-                                                num_samples_fast, quant=_K)
+                                                 num_elements, _conn, 0.,
+                                                 num_samples_fast, quant=_K)
                     expect_capac = np.append(expect_capac, __expect_cap)
 
             print("K={:d}: ZOC={:.3f}".format(_K, min(expect_capac)))
             #_r_ax = np.linspace(.9*min(expect_capac), 1.1*max(expect_capac), 500)
             _hist = np.histogram(expect_capac, bins=100)
             cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
-            _erg_cap_appr = -np.exp(1/num_elements)*special.expi(-1/num_elements)/np.log(2)
-            cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
+            #_erg_cap_appr = -np.exp(1/num_elements)*special.expi(-1/num_elements)/np.log(2)
+            #cdf_appr = np.heaviside(_r_ax-_erg_cap_appr, 0)
             results["ecdf{:d}".format(_K)] = cdf_hist
-            results["appr{:d}".format(_K)] = cdf_appr
+            #results["appr{:d}".format(_K)] = cdf_appr
             if plot:
                 axs.plot(_r_ax, cdf_hist, label="K={:d}, p={:.3f}".format(_K, _conn))
 
