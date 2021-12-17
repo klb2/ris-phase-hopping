@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy import stats, special, integrate, optimize
 import hankel
 
-from phases import rvs_channel_phases, rvs_ris_phases, gains_constant_phase
+from phases import rvs_channel_phases, rvs_ris_phases, gains_constant_phase, rvs_ris_phases_quant
 from utils import export_results
 
 
@@ -53,7 +53,7 @@ def ergodic_capac_exact(num_elements, los_amp=0.):
 
 
 def _process_batch(batch, num_batches, batch_size, num_elements, conn_prob,
-                   los_amp, num_samples_fast):
+                   los_amp, num_samples_fast, quant=None):
     print("Work on batch {:d}/{:d}".format(batch+1, num_batches))
     if los_amp > 0:
         los_phases = 2*np.pi*np.random.rand(batch_size)
@@ -62,8 +62,14 @@ def _process_batch(batch, num_batches, batch_size, num_elements, conn_prob,
         los_phases = None
     channel_realizations = rvs_channel_phases(num_elements, batch_size)
     channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
-    ris_phases = rvs_ris_phases(num_elements, batch_size,
-                                num_samples_fast, copula="indep")
+    if quant is None:
+        ris_phases = rvs_ris_phases(num_elements, batch_size,
+                                    num_samples_fast, copula="indep")
+    else:
+        if not isinstance(quant, int): raise TypeError
+        ris_phases = rvs_ris_phases_quant(num_elements, batch_size,
+                                          num_samples_fast, copula="indep",
+                                          K=quant)
     total_phases = channel_realizations + ris_phases
     channel_absolute = stats.bernoulli.rvs(p=conn_prob, size=(batch_size, num_elements))
     channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
@@ -95,6 +101,7 @@ def random_ris_phases(num_elements, connect_prob=[1.], los_amp=1., num_samples_s
                     delayed(_process_batch)(_batch, num_batches, batch_size,
                         _num_elements, _conn_prob, los_amp, num_samples_fast)
                     for _batch in range(num_batches))
+            expect_capac = np.ravel(expect_capac)
         else:
             expect_capac = []
             for _batch in range(num_batches):

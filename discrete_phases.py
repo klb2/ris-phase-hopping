@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 from scipy import stats, special
 
 from phases import gains_constant_phase, rvs_channel_phases, rvs_ris_phases_quant
+from random_phases import _process_batch
 from utils import export_results
 
 def discrete_rvs_phases(num_elements, num_phase_steps, connect_prob,
                         num_samples_slow=1000, num_samples_fast=5000,
-                        plot=False, export=False):
+                        batch_size=1000, plot=False, export=False):
     if plot:
         fig, axs = plt.subplots()
     channel_realizations = rvs_channel_phases(num_elements, num_samples_slow)
@@ -15,17 +16,26 @@ def discrete_rvs_phases(num_elements, num_phase_steps, connect_prob,
     results = {}
     #_r_ax = np.linspace(0.5, 4, 2000)
     _r_ax = np.linspace(0, 3, 2000)
+    num_batches, last_batch = np.divmod(num_samples_slow, batch_size)
     for _conn in connect_prob:
+        print("Working on p={:.3f}".format(_conn))
         channel_absolute = stats.bernoulli.rvs(p=_conn, size=(num_samples_slow, num_elements))
         channel_absolute = np.tile(channel_absolute, (num_samples_fast, 1, 1))
         for _K in num_phase_steps:
-            ris_phases = rvs_ris_phases_quant(num_elements, num_samples_slow,
-                                              num_samples_fast, copula="indep",
-                                              K=_K)
-            total_phases = channel_realizations + ris_phases
-            const_phase = gains_constant_phase(total_phases, path_amp=channel_absolute)
-            capac_const_phase = np.log2(1 + const_phase)
-            expect_capac = np.mean(capac_const_phase, axis=0)
+            print("Working on K={:d}".format(_K))
+            #ris_phases = rvs_ris_phases_quant(num_elements, num_samples_slow,
+            #                                  num_samples_fast, copula="indep",
+            #                                  K=_K)
+            #total_phases = channel_realizations + ris_phases
+            #const_phase = gains_constant_phase(total_phases, path_amp=channel_absolute)
+            #capac_const_phase = np.log2(1 + const_phase)
+            #expect_capac = np.mean(capac_const_phase, axis=0)
+            expect_capac = []
+            for _batch in range(num_batches):
+                __expect_cap= _process_batch(_batch, num_batches, batch_size,
+                                             num_elements, _conn, 0.,
+                                             num_samples_fast, quant=_K)
+                expect_capac = np.append(expect_capac, __expect_cap)
             print("K={:d}: ZOC={:.3f}".format(_K, min(expect_capac)))
             #_r_ax = np.linspace(.9*min(expect_capac), 1.1*max(expect_capac), 500)
             _hist = np.histogram(expect_capac, bins=100)
