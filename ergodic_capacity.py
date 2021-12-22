@@ -6,7 +6,7 @@ from random_phases import ergodic_capac_approximation, ergodic_capac_exact
 
 
 def plot_ergodic_capacities_phase_hopping(num_elements, los_amp=0.,
-                                               plot=False):
+                                          plot=False):
     if plot:
         fig, axs = plt.subplots()
     results_appr = {}

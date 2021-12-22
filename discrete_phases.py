@@ -17,7 +17,7 @@ def discrete_rvs_phases(num_elements, num_phase_steps, connect_prob,
     #channel_realizations = np.tile(channel_realizations, (num_samples_fast, 1, 1))
     results = {}
     #_r_ax = np.linspace(0.5, 4, 2000)
-    _r_ax = np.linspace(0, 3, 2000)
+    _r_ax = np.linspace(0, 4, 2000)
 
     num_batches, last_batch = np.divmod(num_samples_slow, batch_size)
     for _conn in connect_prob:

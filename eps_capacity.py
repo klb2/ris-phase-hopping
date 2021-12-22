@@ -38,7 +38,6 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--plot", action="store_true")
-    parser.add_argument("--logplot", action="store_true")
     parser.add_argument("--export", action="store_true")
     parser.add_argument("-N", "--num_elements", type=int, nargs="+", required=True)
     parser.add_argument("-a", "--los_amp", type=float, default=0.)
