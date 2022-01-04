@@ -37,6 +37,26 @@ def outage_n_links_exact(rate, num_elements, los_amp: float=0.):
     Fs, err_hank = ht.transform(_int_func, k=s, ret_err=True)
     return np.clip(s*Fs, 0, 1)
 
+def outage_static_phases_approx(rate, num_elements, connect_prob: float=1.,
+                                los_amp: float=0.):
+    _out_approx = [outage_n_links_approx(rate, _links, los_amp=los_amp)
+                   for _links in range(num_elements+1)]
+    _out_weights = stats.binom(n=num_elements, p=connect_prob).pmf(range(num_elements+1))
+    cdf_appr = np.average(_out_approx, weights=_out_weights, axis=0)
+    return cdf_appr
+
+def outage_static_phases_exact(rate, num_elements, connect_prob: float=1.,
+                               los_amp: float=0.):
+    if los_amp == 0:
+        _out_weights = stats.binom(n=num_elements, p=connect_prob).pmf(range(num_elements+1))
+        _out_exact = [outage_n_links_exact(rate, _links, los_amp=los_amp)
+                      for _links in range(num_elements+1)]
+        cdf_exact = np.average(_out_exact, weights=_out_weights, axis=0)
+    else:
+        cdf_exact = np.zeros_like(rate)
+    return cdf_exact
+
+
 def constant_ris_phases(num_elements, connect_prob=[1.], los_amp=0.,
                         num_samples=50000, plot=False, export=False):
     if plot:
@@ -56,17 +76,8 @@ def constant_ris_phases(num_elements, connect_prob=[1.], los_amp=0.,
         #_r_ax = np.linspace(min(capac_const_phase)*.9, max(capac_const_phase)*1.1, 1000)
         _r_ax = np.linspace(0, max(capac_const_phase)*1.1, 200)
         cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
-
-        _out_approx = [outage_n_links_approx(_r_ax, _links, los_amp=los_amp)
-                       for _links in range(_num_elements+1)]
-        _out_weights = stats.binom(n=_num_elements, p=_conn_prob).pmf(range(_num_elements+1))
-        cdf_appr = np.average(_out_approx, weights=_out_weights, axis=0)
-        if los_amp == 0:
-            _out_exact = [outage_n_links_exact(_r_ax, _links, los_amp=los_amp)
-                          for _links in range(_num_elements+1)]
-            cdf_exact = np.average(_out_exact, weights=_out_weights, axis=0)
-        else:
-            cdf_exact = np.zeros_like(_r_ax)
+        cdf_appr = outage_static_phases_approx(_r_ax, _num_elements, _conn_prob, los_amp=los_amp)
+        cdf_exact = outage_static_phases_exact(_r_ax, _num_elements, _conn_prob, los_amp=los_amp)
 
         if plot:
             axs.plot(_r_ax, cdf_hist, label="ECDF N={:d}, p={:.3f}".format(_num_elements, _conn_prob))
