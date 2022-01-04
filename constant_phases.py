@@ -23,29 +23,6 @@ def outage_n_links_approx(rate, num_elements, los_amp: float=0.):
     #cdf_appr = stats.ncx2(df=2, nc=2*los_amp**2/num_elements).cdf(2*(2**rate-1)/num_elements)
     return cdf_appr
 
-#@np.vectorize
-#def outage_n_links_exact(rate, num_elements, los_amp: float=0.):
-#    if los_amp != 0:
-#        raise NotImplementedError("Only NLOS is supported")
-#    if num_elements == 0:
-#        return np.where(rate < np.log2(1+los_amp**2), 0, 1)
-#    if rate == 0:
-#        return 0.
-#
-#    def _int_func(t, s, n):
-#        return special.j1(s*t)*special.j0(t)**n
-#    _arg = np.sqrt(2**rate - 1)
-#    if num_elements == 1:
-#        limit = 1000
-#    elif num_elements == 2:
-#        limit = 500
-#    else:
-#        limit = 200
-#    _int = integrate.quad(_int_func, 0, np.inf, args=(_arg, num_elements), limit=limit)
-#    _int = _int[0]
-#    #_int, abserr = _int
-#    return np.clip(_arg*_int, 0, 1)
-
 def outage_n_links_exact(rate, num_elements, los_amp: float=0.):
     if los_amp != 0:
         raise NotImplementedError("Only NLOS is supported")
@@ -58,7 +35,6 @@ def outage_n_links_exact(rate, num_elements, los_amp: float=0.):
     ht = hankel.HankelTransform(nu=nu, N=_N, h=_h)
     s = np.sqrt(2**rate - 1)
     Fs, err_hank = ht.transform(_int_func, k=s, ret_err=True)
-    #cdf = s * Fs
     return np.clip(s*Fs, 0, 1)
 
 def constant_ris_phases(num_elements, connect_prob=[1.], los_amp=0.,
@@ -85,8 +61,6 @@ def constant_ris_phases(num_elements, connect_prob=[1.], los_amp=0.,
                        for _links in range(_num_elements+1)]
         _out_weights = stats.binom(n=_num_elements, p=_conn_prob).pmf(range(_num_elements+1))
         cdf_appr = np.average(_out_approx, weights=_out_weights, axis=0)
-        #cdf_exact = outage_n_links_exact(_r_ax, 1, 0)
-        #print(cdf_exact)
         if los_amp == 0:
             _out_exact = [outage_n_links_exact(_r_ax, _links, los_amp=los_amp)
                           for _links in range(_num_elements+1)]
@@ -121,7 +95,7 @@ if __name__ == "__main__":
     parser.add_argument("--export", action="store_true")
     parser.add_argument("-N", "--num_elements", nargs="+", type=int, required=True)
     parser.add_argument("-p", "--connect_prob", type=float, nargs="+", default=[1.])
-    parser.add_argument("-n", "--num_samples", type=int, default=50000)
+    parser.add_argument("-s", "--num_samples", type=int, default=50000)
     parser.add_argument("-a", "--los_amp", type=float, default=0.)
     args = vars(parser.parse_args())
     constant_ris_phases(**args)
