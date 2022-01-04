@@ -28,4 +28,5 @@ echo "Figure 10: Static RIS Phases"
 python3 constant_phases.py -N 20 -a 0. -p .1 .5 .9 -s 1000000 --plot --export
 
 echo "Figure 11: Comparison of Phase Hopping, Static, and Perfect Phase Adjustments"
-python3 comparison.py --plot -N 20 -p .1 .5 .9 --export
+python3 comparison.py -N 20 -p .5 --plot --export
+#python3 comparison.py -N 20 -p .1 .5 .9 --plot --export
