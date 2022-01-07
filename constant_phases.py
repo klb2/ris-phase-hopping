@@ -72,12 +72,13 @@ def constant_ris_phases(num_elements, connect_prob=[1.], los_amp=0.,
                                            los_phase=los_phases, los_amp=los_amp,
                                            path_amp=channel_absolute)
         capac_const_phase = np.log2(1 + const_phase)
-        _hist = np.histogram(capac_const_phase, bins=100)
+        _hist = np.histogram(capac_const_phase, bins=1000)
         #_r_ax = np.linspace(min(capac_const_phase)*.9, max(capac_const_phase)*1.1, 1000)
-        _r_ax = np.linspace(0, max(capac_const_phase)*1.1, 200)
+        _r_ax = np.linspace(0.01, max(capac_const_phase)*1.1, 1000)
         cdf_hist = stats.rv_histogram(_hist).cdf(_r_ax)
         cdf_appr = outage_static_phases_approx(_r_ax, _num_elements, _conn_prob, los_amp=los_amp)
         cdf_exact = outage_static_phases_exact(_r_ax, _num_elements, _conn_prob, los_amp=los_amp)
+
 
         if plot:
             axs.plot(_r_ax, cdf_hist, label="ECDF N={:d}, p={:.3f}".format(_num_elements, _conn_prob))
