@@ -38,7 +38,6 @@ def main(num_elements, connect_prob=[1.], plot=False, export=False):
             _fn_end = "N{:d}-p{:.3f}".format(_num_elements, _conn_prob)
             _fn = "{}-{}.dat".format(_fn_prefix, _fn_end)
             export_results(results, _fn)
-            pass
 
     if plot:
         axs.legend()
