@@ -5,10 +5,11 @@ Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
 Jorswieck, Karl-L. Besser, and Cong Sun. IEEE SPAWC 2021,
 [doi:10.1109/SPAWC51858.2021.9593269](https://doi.org/10.1109/SPAWC51858.2021.9593269)),
 "RIS-Assisted Statistical Channel Shaping for Ultra-High Reliability" (Karl-L.
-Besser and Eduard Jorswieck. WSA 2021), and "Reconfigurable
-Intelligent Surface Phase Hopping for Ultra-Reliable Communications" (Karl-L.
-Besser and Eduard Jorswieck. Submitted for publication, Jul. 2021,
-[arXiv:2107.11852](https://arxiv.org/abs/2107.11852)).
+Besser and Eduard Jorswieck. WSA 2021,
+[IEEExplore](https://ieeexplore.ieee.org/document/9739154)), and
+"Reconfigurable Intelligent Surface Phase Hopping for Ultra-Reliable
+Communications" (Karl-L.  Besser and Eduard Jorswieck. Submitted for
+publication, Jul. 2021, [arXiv:2107.11852](https://arxiv.org/abs/2107.11852)).
 
 The idea is to give an interactive version of the calculations and presented
 concepts to the reader. One can also change different parameters and explore
@@ -84,3 +85,17 @@ This research was supported in part by the Deutsche Forschungsgemeinschaft
 This program is licensed under the GPLv3 license. If you in any way use this
 code for research that results in publications, please cite our original
 article listed above.
+
+You can use the following BibTeX entry
+```bibtex
+@article{Besser2021phasehopping,
+  title = {Reconfigurable Intelligent Surface Phase Hopping for Ultra-Reliable Communications},
+  author = {Besser, Karl-Ludwig and Jorswieck, Eduard A.},
+  year = {2021},
+  month = {7},
+  journal = {Submitted for publication},
+  archiveprefix = {arXiv},
+  eprint = {2107.11852},
+  primaryClass = {cs.IT},
+}
+```
