@@ -1,6 +1,8 @@
 # RIS Phase Hopping for Ultra-Reliable Communications
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/klb2/ris-phase-hopping/HEAD)
+![GitHub](https://img.shields.io/github/license/klb2/ris-phase-hopping)
+[![DOI](https://img.shields.io/badge/doi-10.1109/TWC.2022.3172760-informational)](https://doi.org/10.1109/TWC.2022.3172760)
 
 This repository is accompanying the papers "Artificial Fast Fading from
 Reconfigurable Surfaces Enables Ultra-Reliable Communications" (Eduard
