@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Run all script to generate the results presented in the paper "Reconfigurable
 # Intelligent Surface Phase Hopping for Ultra-Reliable Communications" (Karl-L.
-# Besser, Eduard Jorswieck).
+# Besser and Eduard Jorswieck, IEEE Transactions on Wireless Communications,
+# vol. 21, no. 11, pp. 9082–9095, Nov 2022. doi:10.1109/TWC.2022.3172760).
 #
-# Copyright (C) 2021 Karl-Ludwig Besser
+# Copyright (C) 2021-2022 Karl-Ludwig Besser
 # License: GPLv3
 
 echo "Figure 3: Calculating ergodic capacities for NLOS scenario..."
